@@ -1,9 +1,9 @@
 import os
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-from dotenv import load_dotenv
 import random
 import time
 import json
+from dotenv import load_dotenv
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 load_dotenv()
 
@@ -25,32 +25,24 @@ client.configureMQTTOperationTimeout(30)
 print("Conectando al cliente MQTT...")
 client.connect()
 
-HUMIDITY_THRESHOLD = 30.0
-
-def simulate_soil_moisture():
+def simulated_temperature():
   while True:
-    soil_moisture = round(random.uniform(20.0, 40.0), 2)
-    
+    temperature = round(random.uniform(20.0, 40.0), 2)
+
     message = {
-      "device_id": "humidity_device",
-      "timestamp": int(time.time()),
-      "humidity": soil_moisture,
-      "irrigation": 0
+      "device_id" : "temp_device",
+      "timestamp" : int(time.time()),
+      "temperature" : temperature
     }
-    
-    if soil_moisture < HUMIDITY_THRESHOLD:
-      message["irrigation"] = 1
-      print(f"Humedad del suelo baja ({soil_moisture}%), activando riego.")
-    else:
-      print(f"Humedad del suelo adecuada ({soil_moisture}%). No se activa el riego.")
-    
+
+    print(f"Temperatura actual: {temperature} C")
     message_json = json.dumps(message)
-    client.publish("iot/simulated/irrigation", message_json, 1)
-    
-    time.sleep(10)
+    client.publish("iot/simulated/temperature", message_json, 1)
+
+    time.sleep(15)
 
 try:
-  simulate_soil_moisture()
+  simulated_temperature()
 except KeyboardInterrupt:
   print("Simulación detenida.")
   client.disconnect()
